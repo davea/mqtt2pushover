@@ -1,0 +1,6 @@
+- name: Create mqtt2pushover .env file
+  template:
+    src: .env.j2
+    dest: /home/{{ mqtt2pushover.user }}/mqtt2pushover/.env
+  notify:
+    - restart mqtt2pushover

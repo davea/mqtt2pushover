@@ -1,0 +1,19 @@
+- import_tasks: mqtt2pushover.user.yml
+  tags:
+    - mqtt2pushover
+    - mqtt2pushover.user
+
+- import_tasks: mqtt2pushover.install.yml
+  tags:
+    - mqtt2pushover
+    - mqtt2pushover.install
+
+- import_tasks: mqtt2pushover.config.yml
+  tags:
+    - mqtt2pushover
+    - mqtt2pushover.config
+
+- import_tasks: mqtt2pushover.enable.yml
+  tags:
+    - mqtt2pushover
+    - mqtt2pushover.enable

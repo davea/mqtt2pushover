@@ -1,0 +1,8 @@
+- name: Add group for mqtt2pushover
+  group:
+    name: "{{ mqtt2pushover.group }}"
+
+- name: Add user for mqtt2pushover
+  user:
+    name: "{{ mqtt2pushover.user }}"
+    group: "{{ mqtt2pushover.group }}"

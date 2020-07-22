@@ -1,0 +1,9 @@
+- name: Create mqtt2pushover supervisor task
+  template:
+    src: mqtt2pushover.ini.j2
+    dest: /usr/local/etc/supervisor.d/mqtt2pushover.ini
+  notify:
+    - restart mqtt2pushover
+
+- name: restart mqtt2pushover
+  supervisorctl: name=mqtt2pushover state=present

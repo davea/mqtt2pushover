@@ -1,0 +1,35 @@
+- name: Install required packages
+  pkgng:
+    state: present
+    name:
+      - py37-setuptools
+      - py37-virtualenv
+
+- name: Create code directory
+  file:
+    path: "/home/{{ mqtt2pushover.user }}/mqtt2pushover"
+    state: directory
+    owner: "{{ mqtt2pushover.user }}"
+    group: "{{ mqtt2pushover.group }}"
+
+- name: Copy code files into place
+  copy:
+    src: "{{ item }}"
+    dest: "/home/{{ mqtt2pushover.user }}/mqtt2pushover/{{ item }}"
+    owner: "{{ mqtt2pushover.user }}"
+    group: "{{ mqtt2pushover.group }}"
+  with_items:
+    - requirements.txt
+    - mqtt2pushover.py
+  notify:
+    - restart mqtt2pushover
+
+- name: Create/populate virtualenv
+  become_user: "{{ mqtt2pushover.user }}"
+  pip:
+    virtualenv: "/home/{{ mqtt2pushover.user }}/mqtt2pushover-venv"
+    virtualenv_command: "/usr/local/bin/virtualenv"
+    virtualenv_python: "/usr/local/bin/python3.7"
+    requirements: "/home/{{ mqtt2pushover.user }}/mqtt2pushover/requirements.txt"
+  notify:
+    - restart mqtt2pushover

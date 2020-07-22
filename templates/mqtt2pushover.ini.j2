@@ -1,0 +1,11 @@
+[program:mqtt2pushover]
+command=/home/{{ mqtt2pushover.user }}/mqtt2pushover-venv/bin/python mqtt2pushover.py
+directory=/home/{{ mqtt2pushover.user }}/mqtt2pushover
+user={{ mqtt2pushover.user }}
+autostart=true
+autorestart=true
+startsecs=5
+startretries=1000
+environment=PATH="/usr/bin:/usr/local/bin",LC_ALL="en_GB.UTF-8",LANG="en_GB.UTF-8",HOME="/home/{{ mqtt2pushover.user }}",USER="{{ mqtt2pushover.user }}"
+stderr_logfile=/var/log/supervisor/mqtt2pushover.err
+stdout_logfile=/var/log/supervisor/mqtt2pushover.log

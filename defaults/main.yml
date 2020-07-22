@@ -1,0 +1,5 @@
+mqtt2pushover:
+  broker: mqtt://mqtt
+  config: {}
+  user: mqtt2pushover
+  group: mqtt2pushover
