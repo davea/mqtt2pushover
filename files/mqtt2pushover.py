@@ -12,6 +12,22 @@ from mqttwrapper import run_script
 
 def callback(topic, payload, config):
     config = config[topic]
+
+    if config.get("payload") and payload.decode() != config.get("payload"):
+        return
+
+    files = None
+    if config.get("image_url"):
+        try:
+            files = {
+                "attachment": (
+                    "image.jpeg",
+                    requests.get(config.get("image_url"), stream=True, timeout=5).raw,
+                )
+            }
+        except Exception:
+            pass
+
     requests.post(
         "https://api.pushover.net/1/messages.json",
         {
@@ -21,6 +37,7 @@ def callback(topic, payload, config):
             "sound": config.get("sound"),
             "title": config.get("title"),
         },
+        files=files,
         timeout=5,
     )
 
