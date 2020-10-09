@@ -28,15 +28,19 @@ def callback(topic, payload, config):
         except Exception:
             pass
 
+    params = {
+        "token": config["app_key"],
+        "user": config["user_key"],
+        "message": config["message"],
+        "sound": config.get("sound"),
+        "title": config.get("title"),
+    }
+    if config.get("devices"):
+        params["device"] = config["devices"]
+
     requests.post(
         "https://api.pushover.net/1/messages.json",
-        {
-            "token": config["app_key"],
-            "user": config["user_key"],
-            "message": config["message"],
-            "sound": config.get("sound"),
-            "title": config.get("title"),
-        },
+        params,
         files=files,
         timeout=5,
     )
