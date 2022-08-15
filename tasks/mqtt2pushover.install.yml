@@ -2,8 +2,8 @@
   pkgng:
     state: present
     name:
-      - py37-setuptools
-      - py37-virtualenv
+      - py39-setuptools
+      - py39-virtualenv
 
 - name: Create code directory
   file:
@@ -29,7 +29,7 @@
   pip:
     virtualenv: "/home/{{ mqtt2pushover.user }}/mqtt2pushover-venv"
     virtualenv_command: "/usr/local/bin/virtualenv"
-    virtualenv_python: "/usr/local/bin/python3.7"
+    virtualenv_python: "/usr/local/bin/python3.9"
     requirements: "/home/{{ mqtt2pushover.user }}/mqtt2pushover/requirements.txt"
   notify:
     - restart mqtt2pushover
