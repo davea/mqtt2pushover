@@ -11,39 +11,42 @@ from mqttwrapper import run_script
 
 
 def callback(topic, payload, config):
-    config = config[topic]
+    configs = config[topic]
+    if not isinstance(configs, (list, tuple)):
+        configs = [configs]
 
-    if config.get("payload") and payload.decode() != config.get("payload"):
-        return
+    for cfg in configs:
+        if cfg.get("payload") and payload.decode() != cfg.get("payload"):
+            continue
 
-    files = None
-    if config.get("image_url"):
-        try:
-            files = {
-                "attachment": (
-                    "image.jpeg",
-                    requests.get(config.get("image_url"), stream=True, timeout=5).raw,
-                )
-            }
-        except Exception:
-            pass
+        files = None
+        if cfg.get("image_url"):
+            try:
+                files = {
+                    "attachment": (
+                        "image.jpeg",
+                        requests.get(cfg.get("image_url"), stream=True, timeout=5).raw,
+                    )
+                }
+            except Exception:
+                pass
 
-    params = {
-        "token": config["app_key"],
-        "user": config["user_key"],
-        "message": config["message"],
-        "sound": config.get("sound"),
-        "title": config.get("title"),
-    }
-    if config.get("devices"):
-        params["device"] = config["devices"]
+        params = {
+            "token": cfg["app_key"],
+            "user": cfg["user_key"],
+            "message": cfg["message"],
+            "sound": cfg.get("sound"),
+            "title": cfg.get("title"),
+        }
+        if cfg.get("devices"):
+            params["device"] = cfg["devices"]
 
-    requests.post(
-        "https://api.pushover.net/1/messages.json",
-        params,
-        files=files,
-        timeout=5,
-    )
+        requests.post(
+            "https://api.pushover.net/1/messages.json",
+            params,
+            files=files,
+            timeout=5,
+        )
 
 
 def main():
