@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import json
 
 import requests
@@ -16,7 +17,17 @@ def callback(topic, payload, config):
         configs = [configs]
 
     for cfg in configs:
-        if cfg.get("payload") and payload.decode() != cfg.get("payload"):
+        if cfg.get('json', False):
+            try:
+                p = json.loads(payload)
+                m = json.loads(cfg.get("payload"))
+                if not m.items() <= p.items():
+                    # payload from config isn't contained by payload in message
+                    # so it's not a match, nothing to do.
+                    continue
+            except json.JSONDecodeError:
+                print(f"Invalid JSON payload '{payload}' or match '{cfg.get('payload')}", file=sys.stderr)
+        elif cfg.get("payload") and payload.decode() != cfg.get("payload"):
             continue
 
         files = None
