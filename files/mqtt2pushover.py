@@ -10,6 +10,38 @@ load_dotenv()
 
 from mqttwrapper import run_script
 
+last_payloads = {}
+
+def json_payload_matches_config(payload, cfg):
+    try:
+        p = json.loads(payload)
+        m = json.loads(cfg.get("payload"))
+        if m.items() <= p.items():
+            return True
+    except json.JSONDecodeError:
+        print(f"Invalid JSON payload '{payload}' or match '{cfg.get('payload')}", file=sys.stderr)
+    return False
+
+
+def payload_matches_config(topic, payload, cfg):
+    if cfg.get('json', False):
+        matches = json_payload_matches_config(payload, cfg)
+        if not matches:
+            return False
+        if cfg.get('change', False):
+            # should only notify if the state has changed, i.e. the last
+            # payload didn't match
+            last_payload = last_payloads.get(topic)
+            if not last_payload:
+                return True
+            if json_payload_matches_config(last_payload, cfg):
+                return False
+            return True
+    elif cfg.get("payload") and payload.decode() != cfg.get("payload"):
+        return False
+    return True
+
+
 
 def callback(topic, payload, config):
     configs = config[topic]
@@ -17,17 +49,7 @@ def callback(topic, payload, config):
         configs = [configs]
 
     for cfg in configs:
-        if cfg.get('json', False):
-            try:
-                p = json.loads(payload)
-                m = json.loads(cfg.get("payload"))
-                if not m.items() <= p.items():
-                    # payload from config isn't contained by payload in message
-                    # so it's not a match, nothing to do.
-                    continue
-            except json.JSONDecodeError:
-                print(f"Invalid JSON payload '{payload}' or match '{cfg.get('payload')}", file=sys.stderr)
-        elif cfg.get("payload") and payload.decode() != cfg.get("payload"):
+        if not payload_matches_config(topic, payload, cfg):
             continue
 
         files = None
@@ -59,6 +81,7 @@ def callback(topic, payload, config):
             timeout=5,
         )
 
+    last_payloads[topic] = payload
 
 def main():
     config = json.loads(os.environ["MQTT_TOPICS_CONFIG"])
