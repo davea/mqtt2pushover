@@ -73,6 +73,8 @@ def callback(topic, payload, config):
         }
         if cfg.get("devices"):
             params["device"] = cfg["devices"]
+        if cfg.get("priority"):
+            params["priority"] = cfg["priority"]
 
         requests.post(
             "https://api.pushover.net/1/messages.json",
